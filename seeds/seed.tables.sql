@@ -33,8 +33,7 @@ VALUES
   (10, 1, 'moeilijk', 'difficult', 11),
   (11, 1, 'makkelijk', 'easy', 12),
   (12, 1, 'leraar', 'teacher', 13),
-  (13, 1, 'leerling', 'student', null),
-  ;
+  (13, 1, 'leerling', 'student', null);
 
 UPDATE "language" SET head = 1 WHERE id = 1;
 
