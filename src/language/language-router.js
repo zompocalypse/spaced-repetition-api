@@ -68,50 +68,53 @@ languageRouter.post('/guess', jsonParser, async (req, res, next) => {
       res.status(400).json({
         error: `Missing 'guess' in request body`,
       });
-    }
-
-    const words = await LanguageService.getLanguageWords(
-      req.app.get('db'),
-      req.language.id
-    );
-
-    const wordList = await LanguageService.createWordList(words, req.language);
-
-    let isCorrect = false;
-    const current = wordList.head;
-    let translation = current.value.translation;
-    let totalScore = req.language.total_score;
-
-    if (guess === translation) {
-      isCorrect = true;
-      current.value.correct_count++;
-      current.value.memory_value *= 2;
-      totalScore++;
     } else {
-      current.value.incorrect_count++;
-      current.value.memory_value = 1;
+      const words = await LanguageService.getLanguageWords(
+        req.app.get('db'),
+        req.language.id
+      );
+
+      const wordList = await LanguageService.createWordList(
+        words,
+        req.language
+      );
+
+      let isCorrect = false;
+      const current = wordList.head;
+      let translation = current.value.translation;
+      let totalScore = req.language.total_score;
+
+      if (guess === translation) {
+        isCorrect = true;
+        current.value.correct_count++;
+        current.value.memory_value *= 2;
+        totalScore++;
+      } else {
+        current.value.incorrect_count++;
+        current.value.memory_value = 1;
+      }
+
+      wordList.remove(current.value);
+      wordList.insertAt(current.value, current.value.memory_value + 1);
+
+      const next = wordList.head.value;
+
+      await LanguageService.updateWords(
+        req.app.get('db'),
+        req.language.id,
+        wordList,
+        totalScore
+      );
+
+      res.json({
+        nextWord: next.original,
+        wordCorrectCount: next.correct_count,
+        wordIncorrectCount: next.incorrect_count,
+        totalScore,
+        answer: translation,
+        isCorrect,
+      });
     }
-
-    wordList.remove(current.value);
-    wordList.insertAt(current.value, current.value.memory_value + 1);
-
-    const next = wordList.head.value;
-
-    await LanguageService.updateWords(
-      req.app.get('db'),
-      req.language.id,
-      wordList,
-      totalScore
-    );
-
-    res.json({
-      nextWord: next.original,
-      wordCorrectCount: next.correct_count,
-      wordIncorrectCount: next.incorrect_count,
-      totalScore,
-      answer: translation,
-      isCorrect,
-    });
   } catch (error) {
     next(error);
   }
