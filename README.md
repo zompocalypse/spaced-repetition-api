@@ -1,4 +1,17 @@
-# Spaced repetition API!
+# Autolearn!
+
+## Description
+
+Learn a new language using the spaced repetition method.  Seed files are currently set up for Dutch but any additional languages can be added with ease.
+
+## Github repos
+- Server - https://github.com/zompocalypse/spaced-repetition-api
+- Client - https://github.com/zompocalypse/spaced-repetition
+
+## API Endpoints
+- /api/user - user registration endpoint
+- /api/auth - user authentication endpoint
+- /api/language - serving and handling words endpoint
 
 ## Local dev setup
 
